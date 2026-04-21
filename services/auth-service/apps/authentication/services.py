@@ -51,8 +51,6 @@ class AuthService():
         if not user.check_password(password):
             raise ValueError("Invalid password")
         
-        user.is_active = True
-        user.save()
         refresh = RefreshToken.for_user(user)
         return {
             "access_token": str(refresh.access_token),
@@ -69,17 +67,12 @@ class AuthService():
         except TokenError:
             raise ValueError("Invalid refresh token")
 
-    def logout_user(self, user_id):
+    def logout_user(self, refresh_token):
 
         # get the user from the request and then do is_active false and delete access token
         # and refresh token
-        user = self.user_model.objects.filter(id=user_id).first()
-        if not user:
-            raise ValueError("User Does not Exists")
-        user.is_active = False
-        user.access_token = None
-        user.refresh_token = None
-        user.save()
+        token = RefreshToken(refresh_token)
+        token.blacklist()
         return {"message":"User logged out successfully"}
 
 
@@ -94,15 +87,21 @@ class AuthService():
 
     def update_user_details(self, user_id, **kwargs):
         user = self.user_model.objects.filter(id=user_id).first()
+        updated_fields = {}
         if not user:
             raise ValueError("User Does not Exists")
         
         for key, value in kwargs.items():
-            if key.lower() in ['email','mobile_number']:
+            if key.lower() in ['email', 'mobile_number', 'password']:
                 continue
-            setattr(user,key,value)
+            updated_fields[key] = value
+            setattr(user, key, value)
 
         user.save()
+
+        return updated_fields
+
+        
 
     
     def reset_password(self,user_id,new_password):
@@ -111,32 +110,23 @@ class AuthService():
             raise ValueError("No active user found with this id")
         
         user.set_password(new_password)
+        user.save()
         refresh = RefreshToken.for_user(user)
-        access = refresh.access_token
         return {
-            "access_token": str(access),
+            "access_token": str(refresh.access_token),
             "refresh_token": str(refresh)
         }
 
 
-    def refresh_token(self,refresh_token):
-        try:
-            refresh = RefreshToken(refresh_token)
-            return {
-                "access_token": str(refresh.access_token),
-                "refresh_token": str(refresh)
-            }
-        except TokenError:
-            raise ValueError("Invalid refresh token")
-        
-
-    def get_user_details(self,user_id):
-        user = self.user_model.objects.filter(id=user_id).filter(is_active=True).first()
-        return{
-            "email":user.email,
-            "first_name":user.first_name,
-            "last_name":user.last_name,
-            "mobile_number":user.mobile_number,
-            "is_verified":user.is_verified
+    def get_user_details(self, user_id):
+        user = self.user_model.objects.filter(id=user_id, is_active=True).first()
+        if not user:
+            raise ValueError("No active user found with this id")
+        return {
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "mobile_number": user.mobile_number,
+            "is_verified": user.is_verified,
         }
     
