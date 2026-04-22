@@ -1,15 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .serializers import (
-    RegisterSerializer, 
+    RegisterSerializer,
     LoginSerializer,
+    LogoutSerializer,
     UpdateUserSerializer,
-    ResetPasswordSerializer
-    
-    )
+    ResetPasswordSerializer,
+)
 from .services import AuthService
 
 
@@ -20,11 +20,6 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        # TODO: call AuthService and return tokens
-        # service = AuthService()
-        # tokens = service.register_user(**serializer.validated_data)
-        # return Response(tokens, status=status.HTTP_201_CREATED)
         service = AuthService()
         tokens = service.register_user(**serializer.validated_data)
         return Response(tokens, status=status.HTTP_201_CREATED)
@@ -49,9 +44,9 @@ class LoginView(APIView):
     
 
 class LogoutView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
+        serializer = LogoutSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
@@ -63,7 +58,7 @@ class LogoutView(APIView):
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 class RefreshTokenView(APIView):
-    permission_classes = [permissions.allowAny]
+    permission_classes = [AllowAny]
     def post(self, request):
         refresh_token = request.data.get('refresh_token')
         if not refresh_token:
@@ -77,7 +72,7 @@ class RefreshTokenView(APIView):
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class UpdateUserView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def put(self, request):
         serializer = UpdateUserSerializer(data=request.data)
@@ -92,23 +87,23 @@ class UpdateUserView(APIView):
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)    
         
 class ResetPasswordView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = ResetPasswordSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
         service = AuthService()
         try:
-            tokens = service.reset_password(request.user.id, **serializer.validated_data)
+            tokens = service.reset_password(request.user.id, serializer.validated_data['new_password'])
             return Response(tokens, status=status.HTTP_200_OK)
         except ValueError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 
 class DeleteUserView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request):
         service = AuthService()
@@ -119,7 +114,7 @@ class DeleteUserView(APIView):
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 class GetUserDetailsView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -128,14 +123,14 @@ class GetUserDetailsView(APIView):
             "mobile_number": user.mobile_number,
             "first_name": user.first_name,
             "last_name": user.last_name,
-            "provider": user.provider,
+            "provider": user.login_provider,
         }
         return Response(user_data, status=status.HTTP_200_OK)
-    
-class HealthCheckView(APIView):
-    permission_classes = [permissions.allowAny]
 
-    def get(self):
+class HealthCheckView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
         return Response(
             {
                 "status": "ok",
