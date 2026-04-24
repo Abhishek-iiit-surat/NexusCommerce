@@ -11,14 +11,13 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=False)
-    mobile_number = serializers.CharField(max_length=15, required=False)
+    username = serializers.CharField()
     password = serializers.CharField(write_only=True)
     provider = serializers.CharField(max_length=50, required=False)
 
     def validate(self, attrs):
-        if not attrs.get('email') and not attrs.get('mobile_number'):
-            raise serializers.ValidationError("Either email or mobile_number is required.")
+        if not attrs.get('username') or not attrs.get('password'):
+            raise serializers.ValidationError("Username and password are required.")
         return attrs
 
 

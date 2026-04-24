@@ -33,6 +33,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+AUTHENTICATION_BACKENDS = [
+      'apps.authentication.backend.EmailOrMobileBackend',
+]
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [

@@ -2,6 +2,7 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from .models import User, AuthToken
+from django.contrib.auth import authenticate
 
 
 class AuthService():
@@ -36,26 +37,20 @@ class AuthService():
         except Exception as e:
             raise ValueError(str(e))
 
-    def login_user(self, password, email=None, mobile_number=None, provider=None):
-        if email:
-            user = self.user_model.objects.filter(email=email).first()
-            if not user:
-                raise ValueError("User with this email does not exist")
-        elif mobile_number:
-            user = self.user_model.objects.filter(mobile_number=mobile_number).first()
-            if not user:
-                raise ValueError("User with this mobile number does not exist")
-        else:
-            raise ValueError("Email or mobile number is required")
+    def login_user(self, request, username, password, provider=None):
 
-        if not user.check_password(password):
-            raise ValueError("Invalid password")
-        
-        refresh = RefreshToken.for_user(user)
-        return {
-            "access_token": str(refresh.access_token),
-            "refresh_token": str(refresh),
-        }
+        try:
+            user  = authenticate(request, username=username,password=password)
+            if user is None:
+                return None
+            refresh = RefreshToken.for_user(user)
+            return {
+                "access_token": str(refresh.access_token),
+                "refresh_token": str(refresh)
+            }
+        except ValueError as e:
+            print(str(e))
+            return None
 
     def refresh_token(self, refresh_token):
         try:
