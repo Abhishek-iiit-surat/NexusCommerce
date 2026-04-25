@@ -18,6 +18,9 @@ class UserNotFoundError(Exception):
 class InvalidTokenError(Exception):
     pass
 
+class TokenError(Exception):
+    pass
+
 
 def custom_exception_handler(exc, context):
     if isinstance(exc, UserAlreadyExistsError):

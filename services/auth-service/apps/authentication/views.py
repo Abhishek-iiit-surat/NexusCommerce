@@ -54,8 +54,6 @@ class LoginView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         service = AuthService()
         tokens = service.login_user(request, **serializer.validated_data)
-        if tokens is None:
-            return Response({"detail": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(tokens, status=status.HTTP_200_OK)
     
 
@@ -77,11 +75,8 @@ class LogoutView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         service = AuthService()
-        try:
-            service.logout_user(serializer.validated_data['refresh_token'])
-            return Response({"detail": "Logged out successfully"}, status=status.HTTP_200_OK)
-        except ValueError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        service.logout_user(serializer.validated_data['refresh_token'])
+        return Response({"detail": "Logged out successfully"}, status=status.HTTP_200_OK)
         
 class RefreshTokenView(APIView):
     permission_classes = [AllowAny]
@@ -104,11 +99,8 @@ class RefreshTokenView(APIView):
             return Response({"detail": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
         
         service = AuthService()
-        try:
-            tokens = service.refresh_token(refresh_token)
-            return Response(tokens, status=status.HTTP_200_OK)
-        except ValueError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        tokens = service.refresh_token(refresh_token)
+        return Response(tokens, status=status.HTTP_200_OK)
 
 class UpdateUserView(APIView):
     permission_classes = [IsAuthenticated]
@@ -128,11 +120,9 @@ class UpdateUserView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         service = AuthService()
-        try:
-            updated_fields = service.update_user_details(request.user.id, **serializer.validated_data)
-            return Response({"detail": "User details updated successfully", "updated_fields": updated_fields}, status=status.HTTP_200_OK)
-        except ValueError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)    
+        updated_fields = service.update_user_details(request.user.id, **serializer.validated_data)
+        return Response({"detail": "User details updated successfully", "updated_fields": updated_fields}, status=status.HTTP_200_OK)
+ 
         
 class ResetPasswordView(APIView):
     permission_classes = [IsAuthenticated]
@@ -152,11 +142,8 @@ class ResetPasswordView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         service = AuthService()
-        try:
-            tokens = service.reset_password(request.user.id, serializer.validated_data['new_password'])
-            return Response(tokens, status=status.HTTP_200_OK)
-        except ValueError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        tokens = service.reset_password(request.user.id, serializer.validated_data['new_password'])
+        return Response(tokens, status=status.HTTP_200_OK)
         
 
 class DeleteUserView(APIView):
@@ -172,11 +159,8 @@ class DeleteUserView(APIView):
     )
     def delete(self, request):
         service = AuthService()
-        try:
-            result = service.delete_user(request.user.id)
-            return Response(result, status=status.HTTP_200_OK)
-        except ValueError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        result = service.delete_user(request.user.id)
+        return Response(result, status=status.HTTP_200_OK)
         
 class GetUserDetailsView(APIView):
     permission_classes = [IsAuthenticated]

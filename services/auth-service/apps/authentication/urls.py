@@ -7,12 +7,14 @@ from .views import (
     LogoutView,
     RefreshTokenView,
     UpdateUserView,
-    ResetPasswordView
+    ResetPasswordView,
+    DeleteUserView
     )
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
+    path('delete-user/', DeleteUserView.as_view(), name='delete-user'),
     path('get-user-details/', GetUserDetailsView.as_view(), name='get-user-details'),
     path('health-check/', HealthCheckView.as_view(), name='health-check'),
     path('logout/', LogoutView.as_view(), name='logout'),
