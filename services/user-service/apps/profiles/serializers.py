@@ -12,6 +12,5 @@ class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = ['id', 'user_id', 'label', 'full_name', 'phone_number', 'address_line1', 'address_line2',
-                  'city', 'state', 'country', 'pincode', 'is_default_shipping', 'is_default_billing',
-                  'created_at', 'updated_at']
+                  'city', 'state', 'country', 'pincode','created_at', 'updated_at']
         read_only_fields = ['id', 'user_id', 'created_at', 'updated_at']

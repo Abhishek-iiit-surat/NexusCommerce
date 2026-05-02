@@ -66,6 +66,7 @@ class AddressService:
     
     def set_default_billing(self, user_id, address_id):
         address = Address.objects.filter(user_id=user_id, id=address_id).first()
+        Address.objects.filter(user_id=user_id).update(is_default_billing=False)
         if address is None:
             raise AddressNotFoundError(f"Address with id {address_id} not found for user_id {user_id}.")
         address.is_default_billing = True
@@ -74,6 +75,7 @@ class AddressService:
 
     def set_default_shipping(self, user_id, address_id):
         address = Address.objects.filter(user_id=user_id, id=address_id).first()
+        Address.objects.filter(user_id = user_id).update(is_default_shipping=False)
         if address is None:
             raise AddressNotFoundError(f"Address with id {address_id} not found for user_id {user_id}.")
         address.is_default_shipping = True
