@@ -2,8 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter, inline_serializer
 from drf_spectacular.types import OpenApiTypes
+from rest_framework import serializers
 from .services import (
     ProfileService,
     AddressService
@@ -196,8 +197,12 @@ class AddressSetDefaultView(APIView):
 
     @extend_schema(
         summary="Set default address",
-        description="Sets an address as the default shipping or billing address. Send `default_type` as `shipping` or `billing` in the request body.",
+        description="Sets an address as the default shipping or billing address.",
         parameters=[OpenApiParameter("address_id", OpenApiTypes.INT, OpenApiParameter.PATH)],
+        request=inline_serializer(
+            name="AddressSetDefaultRequest",
+            fields={"default_type": serializers.ChoiceField(choices=["shipping", "billing"])},
+        ),
         responses={
             200: AddressSerializer,
             400: OpenApiResponse(description="Invalid or missing default_type"),
