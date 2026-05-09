@@ -2,13 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer, OpenApiParameter
-from rest_framework import serializers as drf_serializers
-from .serializers import (
-    CategorySerializer,
-    ProductSerializer,
-)
-from .services import CategoryService, ProductService
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
+from .authentication import JWTUserAuthentication
+from .serializers import CategorySerializer, ProductSerializer, ProductImageSerializer
+from .services import CategoryService, ProductService, ProductImageService
 
 
 
@@ -29,6 +26,7 @@ class ListProductCategoriesView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class CreateProductCategoryView(APIView):
+    authentication_classes = [JWTUserAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
@@ -49,6 +47,7 @@ class CreateProductCategoryView(APIView):
         return Response(CategorySerializer(category).data, status=status.HTTP_201_CREATED)
     
 class UpdateProductCategoryView(APIView):
+    authentication_classes = [JWTUserAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
@@ -97,6 +96,7 @@ class ListProductsView(APIView):
         }, status=status.HTTP_200_OK)
     
 class CreateProductView(APIView):
+    authentication_classes = [JWTUserAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
@@ -117,6 +117,7 @@ class CreateProductView(APIView):
         return Response(ProductSerializer(product).data, status=status.HTTP_201_CREATED)
     
 class UpdateProductView(APIView):
+    authentication_classes = [JWTUserAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
@@ -154,6 +155,7 @@ class GetProductDetailsView(APIView):
         return Response(ProductSerializer(product).data, status=status.HTTP_200_OK)
     
 class DeleteProductView(APIView):
+    authentication_classes = [JWTUserAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
@@ -170,38 +172,29 @@ class DeleteProductView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class AddProductImageView(APIView):
+    authentication_classes = [JWTUserAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
         summary="Add an image to a product",
         tags=["Products"],
-        request=inline_serializer(
-            name="AddProductImageRequest",
-            fields={
-                "image_url": drf_serializers.URLField(),
-            }
-        ),
+        request=ProductImageSerializer,
         responses={
-            200: OpenApiResponse(description="Image added successfully"),
+            201: ProductImageSerializer,
             400: OpenApiResponse(description="Validation error"),
             404: OpenApiResponse(description="Product not found"),
         },
     )
     def post(self, request, product_id):
-        serializer = self.get_request_serializer(data=request.data)
+        serializer = ProductImageSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        image_url = serializer.validated_data['image_url']
-        service = ProductService()
-        product_image = service.add_product_image(product_id, image_url)
-        return Response({
-            "id": product_image.id,
-            "image_url": product_image.image_url,
-            "created_at": product_image.created_at,
-            "updated_at": product_image.updated_at,
-        }, status=status.HTTP_200_OK)
+        service = ProductImageService()
+        product_image = service.add_product_image(product_id, **serializer.validated_data)
+        return Response(ProductImageSerializer(product_image).data, status=status.HTTP_201_CREATED)
     
 class DeleteProductImageView(APIView):
+    authentication_classes = [JWTUserAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
@@ -209,12 +202,12 @@ class DeleteProductImageView(APIView):
         tags=["Products"],
         responses={
             204: OpenApiResponse(description="Image deleted successfully"),
-            404: OpenApiResponse(description="Product or image not found"),
+            404: OpenApiResponse(description="Image not found"),
         },
     )
-    def delete(self, request, product_id, image_id):
-        service = ProductService()
-        service.delete_product_image(product_id, image_id)
+    def delete(self, request, image_id):
+        service = ProductImageService()
+        service.delete_image(image_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 
