@@ -6,6 +6,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParamet
 from .authentication import JWTUserAuthentication
 from .serializers import CategorySerializer, ProductSerializer, ProductImageSerializer
 from .services import CategoryService, ProductService, ProductImageService
+from .permissions import IsAdminOrSeller, IsBuyer
 
 
 
@@ -27,7 +28,7 @@ class ListProductCategoriesView(APIView):
     
 class CreateProductCategoryView(APIView):
     authentication_classes = [JWTUserAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminOrSeller]
 
     @extend_schema(
         summary="Create a new product category",
@@ -48,7 +49,7 @@ class CreateProductCategoryView(APIView):
     
 class UpdateProductCategoryView(APIView):
     authentication_classes = [JWTUserAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminOrSeller]
 
     @extend_schema(
         summary="Update an existing product category",
@@ -67,6 +68,7 @@ class UpdateProductCategoryView(APIView):
         service = CategoryService()
         category = service.update_category(id, **serializer.validated_data)
         return Response(CategorySerializer(category).data, status=status.HTTP_200_OK)
+    
     
 class ListProductsView(APIView):
     permission_classes = [AllowAny]
@@ -97,7 +99,7 @@ class ListProductsView(APIView):
     
 class CreateProductView(APIView):
     authentication_classes = [JWTUserAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminOrSeller]
 
     @extend_schema(
         summary="Create a new product",
@@ -118,7 +120,7 @@ class CreateProductView(APIView):
     
 class UpdateProductView(APIView):
     authentication_classes = [JWTUserAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminOrSeller]
 
     @extend_schema(
         summary="Update an existing product",
@@ -132,10 +134,11 @@ class UpdateProductView(APIView):
     )
     def put(self, request, id):
         serializer = ProductSerializer(data=request.data)
+        user_id = request.user.id
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         service = ProductService()
-        product = service.update_product(id, **serializer.validated_data)
+        product = service.update_product(id,user_id, **serializer.validated_data)
         return Response(ProductSerializer(product).data, status=status.HTTP_200_OK)
         
 class GetProductDetailsView(APIView):
@@ -156,7 +159,7 @@ class GetProductDetailsView(APIView):
     
 class DeleteProductView(APIView):
     authentication_classes = [JWTUserAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminOrSeller]
 
     @extend_schema(
         summary="Delete a product",
@@ -168,12 +171,12 @@ class DeleteProductView(APIView):
     )
     def delete(self, request, id):
         service = ProductService()
-        service.delete_product(id)
+        service.delete_product(id, user_id=request.user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class AddProductImageView(APIView):
     authentication_classes = [JWTUserAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminOrSeller]
 
     @extend_schema(
         summary="Add an image to a product",
@@ -195,7 +198,7 @@ class AddProductImageView(APIView):
     
 class DeleteProductImageView(APIView):
     authentication_classes = [JWTUserAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminOrSeller]
 
     @extend_schema(
         summary="Delete an image from a product",

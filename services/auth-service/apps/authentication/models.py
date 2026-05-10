@@ -19,12 +19,20 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+
+    class Role(models.TextChoices):
+        ADMIN = ('admin', 'Admin')
+        BUYER = ('buyer','Buyer')
+        SELLER = ('seller', 'Seller')
+
     username = None
     email = models.EmailField(unique=True)
     objects = UserManager()
     mobile_number = models.CharField(max_length=15, unique=True)
     is_verified = models.BooleanField(default=False)
     login_provider = models.CharField(max_length=50, null=True, blank=True)
+    role = models.CharField(max_length=50,choices=Role.choices,default='buyer')
+    is_active = models.BooleanField(default=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 

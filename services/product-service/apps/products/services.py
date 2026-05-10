@@ -1,6 +1,6 @@
 
 from .models import Category, Product, ProductImage
-from .exceptions import ProductNotFoundException, CategoryNotFoundException, ProductImageNotFoundException
+from .exceptions import ProductNotFoundError, CategoryNotFoundError, PermissionDeniedError, ProductImageNotFoundException
 from django.core.paginator import Paginator
 from django.utils.text import slugify
 
@@ -13,7 +13,7 @@ class CategoryService:
         
         category = Category.objects.filter(id=id, is_active=True).first()
         if not category:
-            raise CategoryNotFoundException(f"Category with id {id} not found.")
+            raise CategoryNotFoundError(f"Category with id {id} not found.")
         return category
     
     def create_category(self,**data):
@@ -24,7 +24,9 @@ class CategoryService:
     def update_category(self,id, **data):
         category = Category.objects.filter(id = id, is_active = True).first()
         if not category:
-            raise CategoryNotFoundException(f"Category with id {id} not found.")
+            raise CategoryNotFoundError(f"Category with id {id} not found.")
+        if 'name' in data:
+            data['slug'] = slugify(data['name'])
         for key, value in data.items():
             setattr(category, key, value)
 
@@ -41,29 +43,34 @@ class ProductService:
         return page_obj.object_list, paginator.num_pages
     
     def create_product(self,created_by_id,**data):
+        data['slug'] = slugify(data['name'])
         product = Product.objects.create(created_by = created_by_id, **data)
         return product
 
     def get_product(self,id):
         product = Product.objects.filter(id=id, is_active=True).first()
         if not product:
-            raise ProductNotFoundException(f"Product with id {id} not found.")
+            raise ProductNotFoundError(f"Product with id {id} not found.")
         return product
     
-    def update_product(self,id, **data):
+    def update_product(self,id,user_id ,**data):
         product = Product.objects.filter(id=id, is_active=True).first()
         if not product:
-            raise ProductNotFoundException(f"Product with id {id} not found.")
+            raise ProductNotFoundError(f"Product with id {id} not found.")
+        if product.created_by != user_id:
+            raise PermissionDeniedError(f"you dont have permission to delete or update this product")
         for key, value in data.items():
             setattr(product, key, value)
 
         product.save()
         return product
-    
-    def delete_product(self,id):
+
+    def delete_product(self,id, user_id):
         product = Product.objects.filter(id=id, is_active=True).first()
         if not product:
-            raise ProductNotFoundException(f"Product with id {id} not found.")
+            raise ProductNotFoundError(f"Product with id {id} not found.")
+        if product.created_by != user_id:
+            raise PermissionDeniedError(f"you dont have permission to delete or update this product")
         product.is_active = False
         product.save()
         return product
@@ -77,7 +84,7 @@ class ProductImageService:
         is_default = data.get('is_primary', False)
         product = Product.objects.filter(id=product_id, is_active=True).first()
         if not product:
-            raise ProductNotFoundException(f"Product with id {product_id} not found.")
+            raise ProductNotFoundError(f"Product with id {product_id} not found.")
         if is_default:
             ProductImage.objects.filter(product_id=product_id, is_primary=True).update(is_primary=False)
         image = ProductImage.objects.create(product=product, **data)

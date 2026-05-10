@@ -3,7 +3,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from .models import User, AuthToken
 from django.contrib.auth import authenticate
-from .exceptions import UserAlreadyExistsError, InvalidCredentialsError, UserNotFoundError, InvalidTokenError
+from .exceptions import UserAlreadyExistsError, InvalidCredentialsError, UserNotFoundError, InvalidTokenError, PasswordMisMatch
 
 
 class AuthService():
@@ -14,7 +14,7 @@ class AuthService():
         self.auth_token_model = AuthToken
 
 
-    def register_user(self, email, password, mobile_number, first_name, last_name = None, provider=None):
+    def register_user(self, email, password, mobile_number, first_name, role = 'buyer', last_name = None, provider=None):
         
         if self.user_model.objects.filter(email = email).exists():
             raise UserAlreadyExistsError("Email already exists")
@@ -26,9 +26,11 @@ class AuthService():
             last_name = last_name,
             mobile_number = mobile_number,
             password = password,
-            login_provider = provider
+            login_provider = provider,
+            role = role
         )
         refresh = RefreshToken.for_user(user)
+        refresh['role'] = user.role  # for role based access
         access = refresh.access_token
 
         return {
@@ -43,6 +45,7 @@ class AuthService():
         if user is None:
             raise InvalidCredentialsError("Invalid username or password")
         refresh = RefreshToken.for_user(user)
+        refresh['role'] = user.role
         return {
             "access_token": str(refresh.access_token),
             "refresh_token": str(refresh)
@@ -71,7 +74,8 @@ class AuthService():
         user = self.user_model.objects.filter(id = user_id).first()
         if not user:
             raise UserNotFoundError("User Does not Exists")
-        user.delete()
+        user.is_active = False
+        user.save()
         return {"message":"User deleted successfully"}
     
 
@@ -93,14 +97,18 @@ class AuthService():
         return updated_fields
 
         
-    def reset_password(self,user_id,new_password):
+    def reset_password(self,user_id,old_password,new_password):
         user = self.user_model.objects.filter(id=user_id).filter(is_active=True).first()
         if not user:
             raise UserNotFoundError("No active user found with this id")
+
+        if not user.check_password(old_password):
+            raise PasswordMisMatch("Wrong Old Password")
         
         user.set_password(new_password)
         user.save()
         refresh = RefreshToken.for_user(user)
+        refresh['role'] = user.role
         return {
             "access_token": str(refresh.access_token),
             "refresh_token": str(refresh)

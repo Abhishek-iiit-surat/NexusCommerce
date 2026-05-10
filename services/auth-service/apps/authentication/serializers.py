@@ -8,6 +8,7 @@ class RegisterSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=150)
     last_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
     provider = serializers.CharField(max_length=50, required=False, allow_blank=True)
+    role = serializers.CharField(max_length=50, required=False, allow_blank=True)
 
 
 class LoginSerializer(serializers.Serializer):

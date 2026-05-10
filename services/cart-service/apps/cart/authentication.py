@@ -1,4 +1,3 @@
-# JWTUserAuthentication goes here
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import AccessToken
@@ -7,9 +6,15 @@ from rest_framework_simplejwt.exceptions import TokenError
 
 class JWTUser:
     """Minimal user object populated from JWT claims. No database hit."""
-    def __init__(self, user_id):
+    def __init__(self, user_id, role):
         self.id = user_id
         self.is_authenticated = True
+        self.role = role
+
+        #Note:
+        # django internally sets request.user = JWTUSer
+        #  now when using in views when we do request.user.id we get the id which we have set in the consructor
+        
 
 
 class JWTUserAuthentication(BaseAuthentication):
@@ -26,7 +31,8 @@ class JWTUserAuthentication(BaseAuthentication):
         try:
             token = AccessToken(raw_token)
             user_id = token['user_id']
+            role = token.get('role','buyer')
         except TokenError:
             raise AuthenticationFailed("Invalid or expired token.")
 
-        return (JWTUser(user_id), token)
+        return (JWTUser(user_id,role), token)

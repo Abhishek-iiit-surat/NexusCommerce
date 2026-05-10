@@ -21,6 +21,8 @@ class InvalidTokenError(Exception):
 class TokenError(Exception):
     pass
 
+class PasswordMisMatch(Exception):
+    pass
 
 def custom_exception_handler(exc, context):
     if isinstance(exc, UserAlreadyExistsError):
@@ -33,6 +35,9 @@ def custom_exception_handler(exc, context):
         return Response({"detail": str(exc)}, status=status.HTTP_404_NOT_FOUND)
 
     if isinstance(exc, InvalidTokenError):
+        return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if isinstance(exc,PasswordMisMatch):
         return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
     return exception_handler(exc, context)

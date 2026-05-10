@@ -18,12 +18,18 @@ class ProductAlreadyExistsError(Exception):
 class PermissionDeniedError(Exception):
     pass
 
+class ProductImageNotFoundException(Exception):
+    pass
+
 
 def custom_exception_handler(exc, context):
     if isinstance(exc, ProductNotFoundError):
         return Response({"detail": str(exc)}, status=status.HTTP_404_NOT_FOUND)
 
     if isinstance(exc, CategoryNotFoundError):
+        return Response({"detail": str(exc)}, status=status.HTTP_404_NOT_FOUND)
+    
+    if isinstance(exc, ProductImageNotFoundException):
         return Response({"detail": str(exc)}, status=status.HTTP_404_NOT_FOUND)
 
     if isinstance(exc, ProductAlreadyExistsError):
