@@ -424,9 +424,9 @@ Key architectural decisions are documented in `/docs/adr/`:
 
 | Phase | Focus | Status |
 |---|---|---|
-| 1 | Project foundation, monorepo, Docker Compose | 🔄 In Progress |
-| 2 | Auth & Security (JWT, RBAC, 2FA, Vault) | ⏳ Pending |
-| 3 | Core microservices (product, inventory, cart, order) | ⏳ Pending |
+| 1 | Project foundation, monorepo, Docker Compose | Completed |
+| 2 | Auth & Security (JWT, RBAC, 2FA, Vault) |  Completed |
+| 3 | Core microservices (product, inventory, cart, order) | ⏳ Inprogress |
 | 4 | Async messaging with Kafka + Outbox Pattern | ⏳ Pending |
 | 5 | Distributed transactions & Saga Pattern | ⏳ Pending |
 | 6 | gRPC internal communication | ⏳ Pending |
