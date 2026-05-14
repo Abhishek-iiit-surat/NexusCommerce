@@ -64,7 +64,6 @@ class AuthService():
     def logout_user(self, refresh_token):
 
         # get the user from the request and then do is_active false and delete access token
-        # and refresh token
         token = RefreshToken(refresh_token)
         token.blacklist()
         return {"message":"User logged out successfully"}
