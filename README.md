@@ -87,21 +87,21 @@ Every architectural decision has a reason. Every pattern solves a real problem.
 
 | Service | Responsibility | DB | Port |
 |---|---|---|---|
-| `api-gateway` | Auth validation, routing, rate limiting, BFF | — | 8000 |
-| `auth-service` | JWT, OAuth2, refresh tokens, TOTP 2FA, RBAC | PostgreSQL | 8001 |
-| `user-service` | Profiles, addresses, preferences | PostgreSQL | 8002 |
-| `product-service` | Catalog, variants, pricing tiers, audit logs | PostgreSQL | 8003 |
-| `inventory-service` | Stock levels, reservations, multi-warehouse | PostgreSQL | 8004 |
-| `order-service` | Order lifecycle, Saga orchestration, CQRS | PostgreSQL + MongoDB | 8005 |
-| `payment-service` | Stripe integration, refunds, Event Sourcing | PostgreSQL | 8006 |
-| `cart-service` | Redis-backed cart, promo codes, price sync | Redis | 8007 |
-| `notification-service` | Email, SMS, push, in-app via Kafka events | PostgreSQL | 8008 |
-| `search-service` | Elasticsearch full-text, facets, autocomplete | Elasticsearch | 8009 |
-| `review-service` | Ratings, moderation, aggregates | PostgreSQL | 8010 |
-| `recommendation-service` | Personalized suggestions | MongoDB | 8011 |
-| `analytics-service` | Event tracking, dashboards, funnels | ClickHouse | 8012 |
-| `file-service` | Presigned uploads, image compression, CDN | PostgreSQL + MinIO | 8013 |
-| `admin-service` | Seller portal, ops dashboard | PostgreSQL | 8014 |
+| `api-gateway` | Auth validation, routing, rate limiting, BFF | — | 8001 |
+| `auth-service` | JWT, OAuth2, refresh tokens, TOTP 2FA, RBAC | PostgreSQL | 8002 |
+| `user-service` | Profiles, addresses, preferences | PostgreSQL | 8003 |
+| `product-service` | Catalog, variants, pricing tiers, audit logs | PostgreSQL | 8004 |
+| `inventory-service` | Stock levels, reservations, multi-warehouse | PostgreSQL | 8005 |
+| `order-service` | Order lifecycle, Saga orchestration, CQRS | PostgreSQL + MongoDB | 8006 |
+| `payment-service` | Stripe integration, refunds, Event Sourcing | PostgreSQL | 8007 |
+| `cart-service` | Redis-backed cart, promo codes, price sync | Redis | 8008 |
+| `notification-service` | Email, SMS, push, in-app via Kafka events | PostgreSQL | 8009 |
+| `search-service` | Elasticsearch full-text, facets, autocomplete | Elasticsearch | 80010 |
+| `review-service` | Ratings, moderation, aggregates | PostgreSQL | 8011 |
+| `recommendation-service` | Personalized suggestions | MongoDB | 8012 |
+| `analytics-service` | Event tracking, dashboards, funnels | ClickHouse | 8013 |
+| `file-service` | Presigned uploads, image compression, CDN | PostgreSQL + MinIO | 8014 |
+| `admin-service` | Seller portal, ops dashboard | PostgreSQL | 8015 |
 
 ---
 
