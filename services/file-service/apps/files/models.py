@@ -8,9 +8,10 @@ class UploadedFile(models.Model):
     size = models.PositiveIntegerField()
     uploaded_by = models.IntegerField()  # Store user ID who uploaded the file
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-          return self.original_name
+          return self.cloudinary_url
 
     class Meta:
         ordering = ['-created_at']
