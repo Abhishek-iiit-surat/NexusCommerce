@@ -10,3 +10,6 @@ class FileResponseSerializer(ModelSerializer):
 
 class FileUploadSerializer(serializers.Serializer):
     file = serializers.FileField()
+    resource_type = serializers.CharField(max_length=50, required=False, allow_null=True)
+    resource_id = serializers.IntegerField(required=False, allow_null=True)
+    slot = serializers.CharField(max_length=50, required=False, allow_null=True)

@@ -15,7 +15,9 @@ class FileUploadView(APIView):
     @extend_schema(
         summary="Upload a file",
         tags=["Files"],
-        request=FileUploadSerializer,
+        request={
+          'multipart/form-data': FileUploadSerializer
+        },
         responses={
             201: OpenApiResponse(response=FileResponseSerializer, description="File uploaded successfully"),
             400: OpenApiResponse(description="Validation error"),
@@ -26,10 +28,10 @@ class FileUploadView(APIView):
         serializer = FileUploadSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+    
         file = serializer.validated_data['file']
         service = FileService()
-        new_file = service.upload_file(file, request.user.id)
+        new_file = service.upload_file(request.user.id, **serializer.validated_data)
         return Response(FileResponseSerializer(new_file).data, status=status.HTTP_201_CREATED)
     
 class FileDetailView(APIView):
