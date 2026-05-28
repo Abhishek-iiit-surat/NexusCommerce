@@ -10,8 +10,8 @@ class Order(models.Model):
         DELIVERED = 'delivered', 'Delivered'
         CANCELLED = 'cancelled', 'Cancelled'
 
-    user_id = models.IntegerField()
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    user_id = models.IntegerField(db_index=True)
+    status = models.CharField(db_index=True,max_length=20, choices=Status.choices, default=Status.PENDING)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
     shipping_address = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -26,7 +26,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    product_id = models.IntegerField()
+    product_id = models.IntegerField(db_index=True)
     product_name = models.CharField(max_length=255)
     price_snapshot = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField()

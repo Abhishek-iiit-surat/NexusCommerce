@@ -15,7 +15,7 @@ class UserProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class Address(models.Model):
-    user_id = models.IntegerField()
+    user_id = models.IntegerField(db_index=True)
     label = models.CharField(max_length=50)  # e.g., 'home', 'work'
     full_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20)
@@ -25,8 +25,8 @@ class Address(models.Model):
     state = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
     pincode = models.CharField(max_length=20)
-    is_default_shipping = models.BooleanField(default=False)
-    is_default_billing = models.BooleanField(default=False)
+    is_default_shipping = models.BooleanField(db_index=True, default=False)
+    is_default_billing = models.BooleanField(db_index=True, default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     class Meta:

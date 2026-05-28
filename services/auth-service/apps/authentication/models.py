@@ -45,5 +45,5 @@ class AuthToken(models.Model):
     access_token = models.CharField(max_length=255, unique=True)
     refresh_token = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
+    expires_at = models.DateTimeField(db_index=True)
 
