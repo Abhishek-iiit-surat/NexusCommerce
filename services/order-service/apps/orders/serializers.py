@@ -22,3 +22,9 @@ class OrderSerializer(ModelSerializer):
 class CreateOrderSerializer(serializers.Serializer):
     shipping_address = serializers.JSONField()
     items = OrderItemSerializer(many=True)
+
+class CreateOrderItemSerializer(serializers.Serializer):
+      product_id = serializers.IntegerField()
+      product_name = serializers.CharField(max_length=255)
+      price_snapshot = serializers.DecimalField(max_digits=10,decimal_places=2)
+      quantity = serializers.IntegerField(min_value=1)
