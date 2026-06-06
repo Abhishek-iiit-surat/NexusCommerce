@@ -5,7 +5,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from .authentication import JWTUserAuthentication
 from .serializers import CreateOrderSerializer, OrderSerializer, UpdateOrderStatusSerializer
-from .services import OrderService
+from .services import PlaceOrderService
 
 
 class PlaceOrderView(APIView):

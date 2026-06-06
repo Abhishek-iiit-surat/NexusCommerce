@@ -28,3 +28,7 @@ class CreateOrderItemSerializer(serializers.Serializer):
       product_name = serializers.CharField(max_length=255)
       price_snapshot = serializers.DecimalField(max_digits=10,decimal_places=2)
       quantity = serializers.IntegerField(min_value=1)
+
+class UpdateOrderStatusSerializer(serializers.Serializer):
+    STATUS = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
+    status = serializers.ChoiceField(choices=Order.Status.choices)
