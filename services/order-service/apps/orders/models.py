@@ -18,6 +18,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     reservation_expires_at = models.DateTimeField(null=True, blank=True)
+    version = models.IntegerField(default=0)
 
     def __str__(self):
         return f"Order #{self.id} — {self.user_id} ({self.status})"
