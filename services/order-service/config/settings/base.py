@@ -69,6 +69,29 @@ USE_TZ = True
 STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+REDIS_URL = config('REDIS_URL', default='redis://localhost:6379/0')
+
+CACHES = {
+      'default': {
+          'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+          'LOCATION': REDIS_URL,
+      }
+   }
+
+CELERY_BROKER_URL = REDIS_URL 
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_BEAT_SCHEDULE = {
+      'flush-carts-to-postgres': {
+          'task': 'apps.cart.tasks.flush_pending_carts',
+          'schedule': 60.0,                            # every 60 seconds
+      },
+  }
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'apps.orders.authentication.JWTUserAuthentication',
