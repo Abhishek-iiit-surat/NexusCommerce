@@ -5,3 +5,6 @@ django-decouple
 psycopg2-binary
 drf-spectacular
 django-cors-headers
+redis==5.0.1
+celery==5.3.6
+django-celery-beat==2.6.0
