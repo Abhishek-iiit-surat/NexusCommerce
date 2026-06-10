@@ -1,23 +1,21 @@
-from rest_framework.serializers import ModelSerializer
-from .models import Cart, CartItem
-
-class CartItemSerializer(ModelSerializer):
-
-    class Meta:
-        model = CartItem
-        fields = '__all__'
-        read_only_fields = ['id','created_at', 'updated_at']
+from rest_framework import serializers
 
 
-class CartSerializer(ModelSerializer):
-
-    items = CartItemSerializer(many = True, read_only = True)
-
-    class Meta:
-        model = Cart
-        fields = '__all__'
-        read_only_fields = ['id','user_id']
+class AddCartItemSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField(min_value=1)
+    quantity = serializers.IntegerField(min_value=1)
 
 
+class UpdateCartItemSerializer(serializers.Serializer):
+    quantity = serializers.IntegerField(min_value=1)
 
 
+class CartItemResponseSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+    added_at = serializers.CharField()
+
+
+class CartResponseSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    items = CartItemResponseSerializer(many=True)
