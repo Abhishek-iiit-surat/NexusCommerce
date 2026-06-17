@@ -40,6 +40,7 @@ class CartRedisService:
         self.r.hset(key, product_id_str, value)
         self.r.expire(key, CART_TTL)
         self._mark_dirty(user_id)
+        return True
 
     def update_quantity(self, user_id, product_id, quantity):
         key = _cart_key(user_id)
@@ -90,6 +91,7 @@ class CartRedisService:
             self.r.hdel(key, *existing_fields)
         self.r.expire(key, CART_TTL)
         self._mark_dirty(user_id)
+        return True
 
     def repopulate_from_items(self, user_id, items):
         """
