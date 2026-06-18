@@ -22,9 +22,6 @@ class CartService:
         status = self.redis_service.clear_cart(user_id)
         if not status:
             raise Exception("Failed to clear cart")
-        
-    def get_cart_items(self, user_id):
-        return self.redis_service.get_cart_items(user_id)
     
     def remove_item(self, user_id, product_id):
         status = self.redis_service.remove_item(user_id, product_id)
