@@ -45,7 +45,7 @@ The project covers 15 microservices, an event-driven architecture with Apache Ka
 
 Every architectural decision has a reason. Every pattern solves a real problem.
 
----
+----
 
 ## 🏗️ Architecture Overview
 
