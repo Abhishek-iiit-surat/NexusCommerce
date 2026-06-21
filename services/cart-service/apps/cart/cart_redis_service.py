@@ -111,3 +111,11 @@ class CartRedisService:
 
     def _mark_dirty(self, user_id):
         self.r.zadd("dirty_carts", {str(user_id): time.time()})
+
+    def get_dirty_carts(self):
+        now = time.time()
+        user_ids = self.r.zrangebyscore("dirty_carts",0,now)
+        return [int(uid) for uid in user_ids]
+    
+    def clear_dirty(self,user_id):
+        self.r.zrem("dirty_carts", str(user_id))
