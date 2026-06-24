@@ -18,6 +18,9 @@ class InvalidQuantityError(Exception):
 class ProductUnavailableError(Exception):
     pass
 
+class UnexpectedError(Exception):
+    pass
+
 
 def custom_exception_handler(exc, context):
     if isinstance(exc, CartNotFoundError):
@@ -31,5 +34,8 @@ def custom_exception_handler(exc, context):
 
     if isinstance(exc, ProductUnavailableError):
         return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if isinstance(exc, UnexpectedError):
+        return Response({"detail": str(exc)},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return exception_handler(exc, context)
