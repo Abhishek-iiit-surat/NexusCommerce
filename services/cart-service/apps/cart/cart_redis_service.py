@@ -76,6 +76,8 @@ class CartRedisService:
         raw = self.r.hgetall(_cart_key(user_id))
         items = []
         for product_id_str, value_json in raw.items():
+            if product_id_str == "__empty__":
+                continue
             data = json.loads(value_json)
             items.append({
                 "product_id": int(product_id_str),
@@ -89,13 +91,14 @@ class CartRedisService:
         existing_fields = self.r.hkeys(key)
         if existing_fields:
             self.r.hdel(key, *existing_fields)
-        self.r.expire(key, CART_TTL)
-        self._mark_dirty(user_id)
+            self.r.hset(key, "__empty__", "1")
+            self.r.expire(key, CART_TTL)
+            self._mark_dirty(user_id)
         return True
 
     def repopulate_from_items(self, user_id, items):
         """
-        Used by CartPostgresService during recovery.
+        repopulate redis from the postgres
         items: list of dicts with product_id, quantity, added_at
         """
         key = _cart_key(user_id)
@@ -107,6 +110,8 @@ class CartRedisService:
             })
         if mapping:
             self.r.hset(key, mapping=mapping)
+        else:
+            self.r.hset(key,"__empty__","1")
         self.r.expire(key, CART_TTL)
 
     def _mark_dirty(self, user_id):
