@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package nexus.product;
+
+// Generated Python stubs are imported by both product-service (server)
+// and cart-service (client) — this file is the single source of truth
+// for the contract between them.
+
+service ProductService {
+  // Bulk lookup used by cart-service's catalog cache to enrich cart items.
+  rpc GetProducts(GetProductsRequest) returns (GetProductsResponse);
+}
+
+message GetProductsRequest {
+  repeated int32 ids = 1;
+}
+
+message GetProductsResponse {
+  repeated Product products = 1;
+}
+
+message Product {
+  int32 id = 1;
+  string name = 2;
+  string price = 3;       // decimal as string — avoids float precision issues
+  string image_url = 4;
+}
