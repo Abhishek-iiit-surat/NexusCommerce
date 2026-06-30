@@ -22,6 +22,6 @@ message GetProductsResponse {
 message Product {
   int32 id = 1;
   string name = 2;
-  string price = 3;       // decimal as string — avoids float precision issues
+  string price = 3;       // decimal as string — this avoids float precision issues
   string image_url = 4;
 }
