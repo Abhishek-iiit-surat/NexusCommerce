@@ -13,5 +13,4 @@ class OCCService:
 class PlaceOrderService:
     def placeOrder(self,user_id,order_details):
         shipping_address = order_details.get('shipping_address')
-        
 

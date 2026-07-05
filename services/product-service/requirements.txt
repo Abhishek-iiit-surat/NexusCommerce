@@ -5,3 +5,5 @@ django-decouple
 psycopg2-binary
 drf-spectacular
 django-cors-headers
+grpcio
+grpcio-tools
